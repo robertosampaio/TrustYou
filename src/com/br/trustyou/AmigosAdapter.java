@@ -40,7 +40,7 @@ public class AmigosAdapter extends BaseAdapter {
 	@Override
 	public long getItemId(int position) {
 		// TODO Auto-generated method stub
-		return amigos.get(position).id;
+		return amigos.get(position).getId();
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class AmigosAdapter extends BaseAdapter {
 
 		TextView textViewItem = (TextView) convertView
 				.findViewById(R.id.tvText);
-		textViewItem.setText(amigos.get(position).nome);
+		textViewItem.setText(amigos.get(position).getNome());
 		
 		return convertView;
 	}

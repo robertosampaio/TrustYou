@@ -2,7 +2,10 @@ package com.br.trustyou;
 
 import java.util.ArrayList;
 
+import Fragments.AmigoFragment;
 import Modelos.Amigo;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -11,10 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity {
+	FrameLayout flContainer;
+	private Amigo amigo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,8 @@ public class MainActivity extends ActionBarActivity {
 	 */
 	public static class PlaceholderFragment extends Fragment {
 
+		ListView lvAmigos;
+
 		public PlaceholderFragment() {
 		}
 
@@ -62,17 +71,49 @@ public class MainActivity extends ActionBarActivity {
 					false);
 			return rootView;
 		}
+
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			// TODO Auto-generated method stub
 			super.onActivityCreated(savedInstanceState);
 			ArrayList<Amigo> amigos = new ArrayList<Amigo>();
-			AmigosAdapter amigosAdapter = new AmigosAdapter(getActivity(), amigos);
-		    ListView lvAmigos = (ListView) getActivity().findViewById(R.id.lvAmigos);
-		    lvAmigos.setAdapter(amigosAdapter);
-		    lvAmigos.setOnItemClickListener((OnItemClickListener) getActivity());
-		    amigosAdapter.amigos.add(new Amigo("Roberto"));
+			AmigosAdapter amigosAdapter = new AmigosAdapter(getActivity(),
+					amigos);
+			lvAmigos = (ListView) getActivity().findViewById(R.id.lvAmigos);
+			lvAmigos.setAdapter(amigosAdapter);
+			amigosAdapter.amigos.add(new Amigo("Roberto"));
+			((MainActivity) getActivity()).setAmigo(((AmigosAdapter) amigosAdapter).amigos.get(0));
+			setClickListener();
+		}
+
+		public void setClickListener() {
+			lvAmigos.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					
+					((MainActivity) getActivity()).setAmigo(((AmigosAdapter) parent.getAdapter()).amigos.get(position));
+					
+					FragmentManager fragmentManager = getActivity()
+							.getFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager
+							.beginTransaction();
+					
+					AmigoFragment fragment = new AmigoFragment();
+					fragmentTransaction.replace(R.id.flContainer, fragment);
+					fragmentTransaction.commit();
+					
+				}
+			});
 		}
 	}
-
+	
+	public Amigo getAmigo(){
+		return amigo;
+	}
+	
+	public void setAmigo(Amigo amigo){
+		this.amigo = amigo;
+	}
 }
