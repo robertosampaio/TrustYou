@@ -13,15 +13,19 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity {
 	FrameLayout flContainer;
 	private Amigo amigo;
+	private ListView lv;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,10 @@ public class MainActivity extends ActionBarActivity {
 	public static class PlaceholderFragment extends Fragment {
 
 		ListView lvAmigos;
+		Button btSalvarAmigo;
+		EditText etNomeAmigo;
+		AmigosAdapter amigosAdapter;
+		ArrayList<Amigo> amigos;
 
 		public PlaceholderFragment() {
 		}
@@ -76,14 +84,26 @@ public class MainActivity extends ActionBarActivity {
 		public void onActivityCreated(Bundle savedInstanceState) {
 			// TODO Auto-generated method stub
 			super.onActivityCreated(savedInstanceState);
-			ArrayList<Amigo> amigos = new ArrayList<Amigo>();
-			AmigosAdapter amigosAdapter = new AmigosAdapter(getActivity(),
-					amigos);
+			inicializarVariaveis();
+			setClickListener();
+		}
+
+		private void inicializarVariaveis() {
+			btSalvarAmigo = (Button) getActivity().findViewById(
+					R.id.btSalvarAmigo);
+			etNomeAmigo = (EditText) getActivity().findViewById(
+					R.id.etNomeAmigo);
 			lvAmigos = (ListView) getActivity().findViewById(R.id.lvAmigos);
+			((MainActivity) getActivity()).setLvAmigos(lvAmigos);
+			amigos = new ArrayList<Amigo>();
+			amigosAdapter = new AmigosAdapter(getActivity(), amigos);
 			lvAmigos.setAdapter(amigosAdapter);
 			amigosAdapter.amigos.add(new Amigo("Roberto"));
-			((MainActivity) getActivity()).setAmigo(((AmigosAdapter) amigosAdapter).amigos.get(0));
-			setClickListener();
+			amigosAdapter.amigos.add(new Amigo("James"));
+
+			((MainActivity) getActivity())
+					.setAmigo(((AmigosAdapter) amigosAdapter).amigos.get(0));
+			mudarFragmentAmigo();
 		}
 
 		public void setClickListener() {
@@ -92,28 +112,51 @@ public class MainActivity extends ActionBarActivity {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,
 						int position, long id) {
-					
-					((MainActivity) getActivity()).setAmigo(((AmigosAdapter) parent.getAdapter()).amigos.get(position));
-					
-					FragmentManager fragmentManager = getActivity()
-							.getFragmentManager();
-					FragmentTransaction fragmentTransaction = fragmentManager
-							.beginTransaction();
-					
-					AmigoFragment fragment = new AmigoFragment();
-					fragmentTransaction.replace(R.id.flContainer, fragment);
-					fragmentTransaction.commit();
-					
+
+					((MainActivity) getActivity())
+							.setAmigo(((AmigosAdapter) parent.getAdapter()).amigos
+									.get(position));
+					mudarFragmentAmigo();
 				}
 			});
+
+			btSalvarAmigo.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					amigosAdapter.amigos.add(new Amigo(etNomeAmigo.getText()
+							.toString()));
+					lvAmigos.invalidateViews();
+				}
+			});
+
+		}
+
+		public void mudarFragmentAmigo() {
+			FragmentManager fragmentManager = getActivity()
+					.getFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+
+			AmigoFragment fragment = new AmigoFragment();
+			fragmentTransaction.replace(R.id.flContainer, fragment);
+			fragmentTransaction.commit();
 		}
 	}
-	
-	public Amigo getAmigo(){
+
+	public Amigo getAmigo() {
 		return amigo;
 	}
-	
-	public void setAmigo(Amigo amigo){
+
+	public void setAmigo(Amigo amigo) {
 		this.amigo = amigo;
+	}
+
+	public ListView setLvAmigos(ListView lv) {
+		return this.lv = lv;
+	}
+
+	public ListView getLvAmigos() {
+		return lv;
 	}
 }
